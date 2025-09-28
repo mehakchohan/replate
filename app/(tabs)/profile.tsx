@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
+  Alert,
+  FlatList,
+  Image,
   SafeAreaView,
   ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
-  FlatList,
-  Alert,
-  Image,
+  View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { Theme } from '../../src/theme/colors';
 import { Button } from '../../src/components/Button';
+import { Theme } from '../../src/theme/colors';
 
 interface UserProfile {
   id: number;
@@ -22,6 +22,7 @@ interface UserProfile {
   followers: number;
   following: number;
   posts: number;
+  points: number,
   recipes: Array<{
     id: number;
     title: string;
@@ -55,9 +56,10 @@ export default function ProfileScreen() {
         id: 1,
         username: 'foodie123',
         email: 'foodie@example.com',
-        followers: 150,
-        following: 75,
+        followers: 35,
+        following: 67,
         posts: 9,
+        points:12,
         recipes: [
           {
             id: 1,
@@ -74,7 +76,7 @@ export default function ProfileScreen() {
           {
             id: 3,
             title: 'Pasta Carbonara',
-            image: 'https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=300',
+            image: 'https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?q=80&w=1364&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
             likes: 67,
           },
           {
@@ -201,7 +203,6 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
-          <View style={styles.titleAccent} />
           <Text style={styles.title}>Profile</Text>
         </View>
         <TouchableOpacity onPress={handleSettings} style={styles.settingsButton}>
@@ -237,6 +238,14 @@ export default function ProfileScreen() {
               <Text style={styles.statNumber}>{user.following}</Text>
               <Text style={styles.statLabel}>Following</Text>
             </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{user.points}</Text>
+              <View style={styles.pointsCard}>
+                <Ionicons name="star" size={12} color="#FFD700" />
+                <Text style={styles.pointsText}>Points</Text>
+              </View>
+          </View>
           </View>
 
           <View style={styles.actionButtons}>
@@ -245,12 +254,6 @@ export default function ProfileScreen() {
               onPress={handleEditProfile}
               style={styles.editButton}
               variant="outline"
-            />
-            <Button
-              title="Logout"
-              onPress={handleLogout}
-              style={styles.logoutButton}
-              variant="secondary"
             />
           </View>
         </View>
@@ -343,8 +346,8 @@ const styles = StyleSheet.create({
     paddingTop: Theme.spacing.md,
     paddingBottom: Theme.spacing.sm,
     backgroundColor: Theme.colors.background,
-    borderBottomWidth: 2,
-    borderBottomColor: Theme.colors.primary,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Theme.colors.border,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -434,8 +437,24 @@ const styles = StyleSheet.create({
   },
   statDivider: {
     width: 1,
-    height: 30,
+    height: 28,
     backgroundColor: Theme.colors.border,
+    opacity: 0.4,
+  },
+  pointsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 10,
+    backgroundColor: '#FFF9E6',
+  },
+  pointsText: {
+    marginLeft: 6,
+    fontSize: Theme.fontSize.sm,
+    fontWeight: '600',
+    color: Theme.colors.primary,
   },
   actionButtons: {
     flexDirection: 'row',

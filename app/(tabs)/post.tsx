@@ -1,25 +1,24 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Alert,
-  TextInput,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { Theme } from '../../src/theme/colors';
+import React, { useState } from 'react';
+import {
+  Alert,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Button } from '../../src/components/Button';
 import { Input } from '../../src/components/Input';
+import { Theme } from '../../src/theme/colors';
 
 export default function PostScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [caption, setCaption] = useState('');
   const [fullRecipe, setFullRecipe] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -103,7 +102,6 @@ export default function PostScreen() {
         body: JSON.stringify({
           title,
           description,
-          caption,
           fullRecipe,
           image: image || 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300',
           tags: selectedTags,
@@ -118,7 +116,6 @@ export default function PostScreen() {
           { text: 'OK', onPress: () => {
             setTitle('');
             setDescription('');
-            setCaption('');
             setFullRecipe('');
             setImage(null);
             setSelectedTags([]);
@@ -132,7 +129,6 @@ export default function PostScreen() {
         { text: 'OK', onPress: () => {
           setTitle('');
           setDescription('');
-          setCaption('');
           setFullRecipe('');
           setImage(null);
           setSelectedTags([]);
@@ -171,14 +167,14 @@ export default function PostScreen() {
 
         <View style={styles.form}>
           <Input
-            label="Recipe Title"
+            label="Recipe Title*"
             placeholder="Enter recipe title"
             value={title}
             onChangeText={setTitle}
           />
 
           <View style={styles.textAreaContainer}>
-            <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>Description*</Text>
             <View style={styles.textAreaWrapper}>
               <TextInput
                 style={styles.textArea}
@@ -192,13 +188,6 @@ export default function PostScreen() {
               />
             </View>
           </View>
-
-          <Input
-            label="Caption (Optional)"
-            placeholder="Add a fun caption for your post..."
-            value={caption}
-            onChangeText={setCaption}
-          />
 
           <View style={styles.textAreaContainer}>
             <Text style={styles.label}>Full Recipe (Optional)</Text>
@@ -240,14 +229,6 @@ export default function PostScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
-
-          <View style={styles.tips}>
-            <Text style={styles.tipsTitle}>Tips for a great post:</Text>
-            <Text style={styles.tipText}>• Use a clear, appetizing photo</Text>
-            <Text style={styles.tipText}>• Include cooking time and difficulty</Text>
-            <Text style={styles.tipText}>• List all ingredients clearly</Text>
-            <Text style={styles.tipText}>• Share any special techniques</Text>
           </View>
         </View>
       </ScrollView>

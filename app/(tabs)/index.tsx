@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
+  Alert,
   FlatList,
   RefreshControl,
-  Alert,
-  TouchableOpacity,
-  TextInput,
+  SafeAreaView,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Theme } from '../../src/theme/colors';
 import { RecipeCard } from '../../src/components/RecipeCard';
+import { Theme } from '../../src/theme/colors';
 
 interface Recipe {
   id: number;
@@ -75,7 +75,7 @@ export default function FeedScreen() {
           title: 'Beef Tacos',
           description: 'Authentic Mexican tacos with seasoned ground beef, fresh cilantro, and lime',
           caption: 'Taco Tuesday done right! 🌮',
-          image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300',
+          image: 'https://unsplash.com/photos/1zjpCGXzlfA/download?force=true&w=300',
           likes: 78,
           comments: 12,
           triedCount: 34,
@@ -176,7 +176,38 @@ export default function FeedScreen() {
           isSaved: false,
           isLiked: false,
           isTried: false
-        }
+        },
+        {
+          id: 9,
+          title: 'Spicy Ramen',
+          description: 'Rich chicken broth, chili oil, and jammy eggs with spring onions.',
+          caption: 'Rainy day comfort 🍜',
+          fullRecipe: '1) Simmer stock + miso\n2) Cook noodles 3 min\n3) Top with egg, chili oil, scallions',
+          image: 'https://images.unsplash.com/photo-1546069901-eacef0df6022?w=300',
+          likes: 121,
+          comments: 14,
+          triedCount: 52,
+          tags: ['spicy', 'quick', 'comfort'],
+          user: { username: 'noodle_ninja' },
+          isSaved: false,
+          isLiked: false,
+          isTried: false
+        },
+        {
+          id: 10,
+          title: 'Sushi Platter',
+          description: 'Assorted nigiri and maki with fresh salmon, tuna, and avocado.',
+          caption: 'Roll with it 🍣',
+          image: 'https://images.unsplash.com/photo-1553621042-f6e147245754?w=300',
+          likes: 198,
+          comments: 27,
+          triedCount: 71,
+          tags: ['japanese', 'seafood', 'healthy'],
+          user: { username: 'umami_club' },
+          isSaved: false,
+          isLiked: false,
+          isTried: false
+        },
       ];
 
       setRecipes(feedType === 'friends' ? mockRecipes.slice(0, 5) : mockRecipes);
@@ -280,16 +311,53 @@ export default function FeedScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
-          <View style={styles.titleAccent} />
-          <Text style={styles.title}>Feed</Text>
+          <Text style={styles.title}>replate</Text>
         </View>
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="notifications-outline" size={24} color={Theme.colors.primary} />
-        </TouchableOpacity>
       </View>
 
-      {/* Feed Type Tabs */}
-      <View style={styles.tabContainer}>
+      {/* Search Bar */}
+      <FlatList
+      data={filteredRecipes}
+      renderItem={renderRecipe}
+      keyExtractor={(item) => item.id.toString()}
+      contentContainerStyle={styles.list}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={Theme.colors.primary}
+        />
+      }
+      // 👇 everything above the list items goes here
+      ListHeaderComponent={
+        <>
+          {/* Search bar */}
+          <View style={styles.searchContainer}>
+            <View style={styles.searchBar}>
+              <View style={styles.iconBox}>
+                <Ionicons name="search" size={20} color={Theme.colors.text.secondary} />
+              </View>
+
+              <TextInput
+                style={[styles.searchInput, { marginLeft: Theme.spacing.sm }]}
+                placeholder="Search recipes, tags..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                placeholderTextColor={Theme.colors.text.light}
+              />
+              {searchQuery ? (
+                <TouchableOpacity onPress={() => setSearchQuery('')}>
+                  <Ionicons name="close" size={20} color={Theme.colors.text.secondary} />
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          </View>
+
+          {/* Feed Type Tabs */}
+        <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tab, feedType === 'friends' && styles.activeTab]}
           onPress={() => setFeedType('friends')}
@@ -318,29 +386,8 @@ export default function FeedScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color={Theme.colors.text.secondary} />
-          <TextInput
-            style={[styles.searchInput, { marginLeft: Theme.spacing.sm }]}
-            placeholder="Search recipes, tags..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            onFocus={() => setIsSearchFocused(true)}
-            onBlur={() => setIsSearchFocused(false)}
-            placeholderTextColor={Theme.colors.text.light}
-          />
-          {searchQuery ? (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close" size={20} color={Theme.colors.text.secondary} />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-      </View>
-
-      {/* Tag Filter - Only show when search is focused or has content */}
-      {(isSearchFocused || searchQuery.length > 0) && (
+      {/* Tag Filter */}
+      {//(isSearchFocused || searchQuery.length > 0) && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -365,33 +412,22 @@ export default function FeedScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
-      )}
-
-      <FlatList
-        data={filteredRecipes}
-        renderItem={renderRecipe}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={Theme.colors.primary}
-          />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Ionicons name="restaurant-outline" size={64} color={Theme.colors.text.light} />
-            <Text style={styles.emptyText}>No recipes found</Text>
-            <Text style={styles.emptySubtext}>
-              {searchQuery || selectedTag
-                ? 'Try adjusting your search or filters'
-                : 'Be the first to share a recipe!'}
-            </Text>
-          </View>
-        }
-      />
+      //)
+      }
+  </>
+      }
+      ListEmptyComponent={
+        <View style={styles.emptyState}>
+          <Ionicons name="restaurant-outline" size={64} color={Theme.colors.text.light} />
+          <Text style={styles.emptyText}>No recipes found</Text>
+          <Text style={styles.emptySubtext}>
+            {searchQuery || selectedTag
+              ? 'Try adjusting your search or filters'
+              : 'Be the first to share a recipe!'}
+          </Text>
+        </View>
+      }
+    />
     </SafeAreaView>
   );
 }
@@ -406,11 +442,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Theme.spacing.lg,
-    paddingTop: Theme.spacing.md,
-    paddingBottom: Theme.spacing.sm,
+    paddingTop: Theme.spacing.lg,
+    paddingBottom: Theme.spacing.md,
     backgroundColor: Theme.colors.background,
-    borderBottomWidth: 2,
-    borderBottomColor: Theme.colors.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: Theme.colors.border,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -419,14 +455,15 @@ const styles = StyleSheet.create({
   titleAccent: {
     width: 4,
     height: 24,
-    backgroundColor: Theme.colors.primary,
+    backgroundColor: Theme.colors.primaryDark,
     marginRight: Theme.spacing.sm,
     borderRadius: 2,
   },
   title: {
     fontSize: Theme.fontSize.xl,
     fontWeight: Theme.fontWeight.bold,
-    color: Theme.colors.text.primary,
+    color: Theme.colors.primaryDark,
+    letterSpacing: 0.2,
   },
   headerActions: {
     flexDirection: 'row',
@@ -447,11 +484,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: Theme.spacing.md,
+    paddingVertical: Theme.spacing.md, //16
+    paddingHorizontal: Theme.spacing.sm,
     borderBottomWidth: 2,
     borderBottomColor: 'transparent',
+    gap: 6,
   },
   activeTab: {
+    borderBottomWidth: 2,
     borderBottomColor: Theme.colors.primary,
   },
   tabText: {
@@ -466,21 +506,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.lg,
     paddingVertical: Theme.spacing.md,
     backgroundColor: Theme.colors.background,
+    marginHorizontal: -16,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
+    height: 44,
     backgroundColor: Theme.colors.background,
-    borderRadius: Theme.borderRadius.xl,
-    paddingHorizontal: Theme.spacing.lg,
-    paddingVertical: Theme.spacing.md,
-    borderWidth: 2,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderWidth: 1,
     borderColor: Theme.colors.border,
     ...Theme.shadows.sm,
+    overflow: 'visible',
+  },
+  iconBox: {
+  width: 22,                               // >= icon size
+  height: 22,
+  justifyContent: 'center',
+  alignItems: 'center',
+  flexShrink: 0,                           // <-- don't let icons get squeezed
   },
   searchInput: {
     flex: 1,
-    fontSize: Theme.fontSize.md,
+    fontSize: 16,
     color: Theme.colors.text.primary,
     fontWeight: Theme.fontWeight.medium,
   },
@@ -490,18 +540,17 @@ const styles = StyleSheet.create({
     borderBottomColor: Theme.colors.border,
   },
   tagContent: {
-    paddingHorizontal: Theme.spacing.lg,
+    paddingHorizontal: Theme.spacing.md,
     paddingVertical: Theme.spacing.md,
   },
   tagButton: {
-    paddingHorizontal: Theme.spacing.lg,
-    paddingVertical: Theme.spacing.sm,
-    borderRadius: Theme.borderRadius.round,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
     backgroundColor: Theme.colors.background,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: Theme.colors.border,
-    marginRight: Theme.spacing.sm,
-    ...Theme.shadows.sm,
+    marginRight: 6,
   },
   activeTagButton: {
     backgroundColor: Theme.colors.primary,
@@ -509,8 +558,8 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.05 }],
   },
   tagText: {
-    fontSize: Theme.fontSize.sm,
-    fontWeight: Theme.fontWeight.semiBold,
+    fontSize: 13,
+    fontWeight: '600',
     color: Theme.colors.text.primary,
   },
   activeTagText: {

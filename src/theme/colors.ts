@@ -39,7 +39,7 @@ export const Theme = {
     sm: 4,
     md: 8,
     lg: 12,
-    xl: 16,
+    xl: 18,
     round: 50,
   },
   fontSize: {

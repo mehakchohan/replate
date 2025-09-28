@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
   FlatList,
   RefreshControl,
+  SafeAreaView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../src/theme/colors';
 
 interface LeaderboardUser {
   id: number;
   username: string;
   posts: number;
-  totalLikes: number;
+  totalPoints: number;
 }
 
 export default function LeaderboardScreen() {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  // Always sort by totalLikes since we removed sorting options
+  // Always sort by totalPoints since we removed sorting options
 
   const fetchLeaderboard = async () => {
     try {
@@ -32,11 +32,11 @@ export default function LeaderboardScreen() {
     } catch (error) {
       console.log('Using mock data for demo');
       setUsers([
-        { id: 1, username: 'chef_master', posts: 25, totalLikes: 1250 },
-        { id: 2, username: 'foodie123', posts: 12, totalLikes: 890 },
-        { id: 3, username: 'healthyguru', posts: 18, totalLikes: 720 },
-        { id: 4, username: 'bakerqueen', posts: 15, totalLikes: 650 },
-        { id: 5, username: 'spicychef', posts: 8, totalLikes: 420 },
+        { id: 1, username: 'chef_master', posts: 25, totalPoints: 1250 },
+        { id: 2, username: 'foodie123', posts: 12, totalPoints: 890 },
+        { id: 3, username: 'healthyguru', posts: 18, totalPoints: 720 },
+        { id: 4, username: 'bakerqueen', posts: 15, totalPoints: 650 },
+        { id: 5, username: 'spicychef', posts: 8, totalPoints: 420 },
       ]);
     } finally {
       setLoading(false);
@@ -53,7 +53,7 @@ export default function LeaderboardScreen() {
     fetchLeaderboard();
   };
 
-  const sortedUsers = [...users].sort((a, b) => b.totalLikes - a.totalLikes);
+  const sortedUsers = [...users].sort((a, b) => b.totalPoints - a.totalPoints);
 
   const getRankIcon = (index: number) => {
     switch (index) {
@@ -71,7 +71,6 @@ export default function LeaderboardScreen() {
         );
     }
   };
-
 
   const renderUser = ({ item, index }: { item: LeaderboardUser; index: number }) => (
     <TouchableOpacity style={styles.userItem}>
@@ -94,10 +93,10 @@ export default function LeaderboardScreen() {
 
       <View style={styles.userScore}>
         <Text style={styles.scoreNumber}>
-          {item.totalLikes}
+          {item.totalPoints}
         </Text>
         <Text style={styles.scoreLabel}>
-          likes
+          Points
         </Text>
       </View>
     </TouchableOpacity>
@@ -107,7 +106,7 @@ export default function LeaderboardScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.titleContainer}>
-          <View style={styles.titleAccent} />
+          {/* <View style={styles.titleAccent} /> */}
           <Text style={styles.title}>Leaderboard</Text>
         </View>
         <View style={styles.trophyContainer}>
@@ -154,8 +153,8 @@ const styles = StyleSheet.create({
     paddingTop: Theme.spacing.md,
     paddingBottom: Theme.spacing.sm,
     backgroundColor: Theme.colors.background,
-    borderBottomWidth: 2,
-    borderBottomColor: Theme.colors.primary,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Theme.colors.border,
   },
   titleContainer: {
     flexDirection: 'row',
