@@ -10,6 +10,7 @@ import {
   Alert,
   Image,
 } from 'react-native';
+import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '../../src/theme/colors';
 import { Button } from '../../src/components/Button';
@@ -27,12 +28,21 @@ interface UserProfile {
     image: string;
     likes: number;
   }>;
+  savedRecipes: Array<{
+    id: number;
+    title: string;
+    image: string;
+    likes: number;
+    user: {
+      username: string;
+    };
+  }>;
 }
 
 export default function ProfileScreen() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'recipes' | 'liked'>('recipes');
+  const [activeTab, setActiveTab] = useState<'recipes' | 'saved'>('recipes');
 
   const fetchUserProfile = async () => {
     try {
@@ -47,19 +57,19 @@ export default function ProfileScreen() {
         email: 'foodie@example.com',
         followers: 150,
         following: 75,
-        posts: 12,
+        posts: 9,
         recipes: [
           {
             id: 1,
             title: 'Chocolate Chip Cookies',
             image: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=300',
-            likes: 45,
+            likes: 145,
           },
           {
             id: 2,
             title: 'Avocado Toast',
             image: 'https://images.unsplash.com/photo-1525351326368-efbb5cb6814d?w=300',
-            likes: 32,
+            likes: 92,
           },
           {
             id: 3,
@@ -67,6 +77,72 @@ export default function ProfileScreen() {
             image: 'https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=300',
             likes: 67,
           },
+          {
+            id: 4,
+            title: 'Blueberry Muffins',
+            image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300',
+            likes: 84,
+          },
+          {
+            id: 5,
+            title: 'Greek Salad',
+            image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300',
+            likes: 53,
+          },
+          {
+            id: 6,
+            title: 'Beef Stir Fry',
+            image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=300',
+            likes: 76,
+          },
+          {
+            id: 7,
+            title: 'Lemon Cake',
+            image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300',
+            likes: 112,
+          },
+          {
+            id: 8,
+            title: 'Fish Tacos',
+            image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=300',
+            likes: 98,
+          },
+          {
+            id: 9,
+            title: 'Chicken Curry',
+            image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=300',
+            likes: 87,
+          },
+        ],
+        savedRecipes: [
+          {
+            id: 101,
+            title: 'Avocado Toast',
+            image: 'https://images.unsplash.com/photo-1525351326368-efbb5cb6814d?w=300',
+            likes: 92,
+            user: { username: 'healthyguru' }
+          },
+          {
+            id: 102,
+            title: 'Pizza Margherita',
+            image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300',
+            likes: 203,
+            user: { username: 'pizzamaker' }
+          },
+          {
+            id: 103,
+            title: 'Thai Green Curry',
+            image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=300',
+            likes: 67,
+            user: { username: 'spicefood_fan' }
+          },
+          {
+            id: 104,
+            title: 'Chocolate Lava Cake',
+            image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300',
+            likes: 178,
+            user: { username: 'dessert_artist' }
+          }
         ],
       });
     } finally {
@@ -83,7 +159,7 @@ export default function ProfileScreen() {
   };
 
   const handleSettings = () => {
-    Alert.alert('Settings', 'Settings screen would open here');
+    router.push('/settings');
   };
 
   const handleLogout = () => {
@@ -105,7 +181,7 @@ export default function ProfileScreen() {
       <View style={styles.recipeOverlay}>
         <View style={styles.recipeLikes}>
           <Ionicons name="heart" size={16} color={Theme.colors.text.white} />
-          <Text style={styles.recipeLikesText}>{item.likes}</Text>
+          <Text style={[styles.recipeLikesText, { marginLeft: 4 }]}>{item.likes}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -124,9 +200,12 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
-        <TouchableOpacity onPress={handleSettings}>
-          <Ionicons name="settings-outline" size={24} color={Theme.colors.text.primary} />
+        <View style={styles.titleContainer}>
+          <View style={styles.titleAccent} />
+          <Text style={styles.title}>Profile</Text>
+        </View>
+        <TouchableOpacity onPress={handleSettings} style={styles.settingsButton}>
+          <Ionicons name="settings-outline" size={24} color={Theme.colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -186,50 +265,65 @@ export default function ProfileScreen() {
               size={20}
               color={activeTab === 'recipes' ? Theme.colors.primary : Theme.colors.text.secondary}
             />
-            <Text style={[styles.tabText, activeTab === 'recipes' && styles.activeTabText]}>
+            <Text style={[styles.tabText, activeTab === 'recipes' && styles.activeTabText, { marginLeft: Theme.spacing.xs }]}>
               My Recipes
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.tab, activeTab === 'liked' && styles.activeTab]}
-            onPress={() => setActiveTab('liked')}
+            style={[styles.tab, activeTab === 'saved' && styles.activeTab]}
+            onPress={() => setActiveTab('saved')}
           >
             <Ionicons
-              name="heart"
+              name="bookmark"
               size={20}
-              color={activeTab === 'liked' ? Theme.colors.primary : Theme.colors.text.secondary}
+              color={activeTab === 'saved' ? Theme.colors.primary : Theme.colors.text.secondary}
             />
-            <Text style={[styles.tabText, activeTab === 'liked' && styles.activeTabText]}>
-              Liked
+            <Text style={[styles.tabText, activeTab === 'saved' && styles.activeTabText, { marginLeft: Theme.spacing.xs }]}>
+              Saved
             </Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.recipesContainer}>
-          {activeTab === 'recipes' ? (
-            <FlatList
-              data={user.recipes}
-              renderItem={renderRecipeItem}
-              keyExtractor={(item) => item.id.toString()}
-              numColumns={3}
-              columnWrapperStyle={styles.recipeRow}
-              scrollEnabled={false}
-              ListEmptyComponent={
-                <View style={styles.emptyState}>
-                  <Ionicons name="restaurant-outline" size={48} color={Theme.colors.text.light} />
-                  <Text style={styles.emptyText}>No recipes yet</Text>
-                  <Text style={styles.emptySubtext}>Share your first recipe!</Text>
+          <FlatList
+            key={activeTab} // Force re-render when tab changes
+            data={activeTab === 'recipes' ? user.recipes : user.savedRecipes}
+            renderItem={activeTab === 'recipes' ? renderRecipeItem : ({ item }) => (
+              <TouchableOpacity style={styles.savedRecipeItem}>
+                <Image source={{ uri: item.image }} style={styles.savedRecipeImage} />
+                <View style={styles.savedRecipeInfo}>
+                  <Text style={styles.savedRecipeTitle} numberOfLines={2}>{item.title}</Text>
+                  <View style={styles.savedRecipeFooter}>
+                    <Text style={styles.savedRecipeUser}>by @{item.user.username}</Text>
+                    <View style={styles.savedRecipeLikes}>
+                      <Ionicons name="heart" size={12} color={Theme.colors.accent} />
+                      <Text style={[styles.savedRecipeLikesText, { marginLeft: 2 }]}>{item.likes}</Text>
+                    </View>
+                  </View>
                 </View>
-              }
-            />
-          ) : (
-            <View style={styles.emptyState}>
-              <Ionicons name="heart-outline" size={48} color={Theme.colors.text.light} />
-              <Text style={styles.emptyText}>No liked recipes</Text>
-              <Text style={styles.emptySubtext}>Start liking recipes to see them here!</Text>
-            </View>
-          )}
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={activeTab === 'recipes' ? 3 : 1}
+            columnWrapperStyle={activeTab === 'recipes' ? styles.recipeRow : null}
+            scrollEnabled={false}
+            ListEmptyComponent={
+              <View style={styles.emptyState}>
+                <Ionicons
+                  name={activeTab === 'recipes' ? "restaurant-outline" : "bookmark-outline"}
+                  size={48}
+                  color={Theme.colors.text.light}
+                />
+                <Text style={styles.emptyText}>
+                  {activeTab === 'recipes' ? 'No recipes yet' : 'No saved recipes'}
+                </Text>
+                <Text style={styles.emptySubtext}>
+                  {activeTab === 'recipes' ? 'Share your first recipe!' : 'Save recipes to see them here!'}
+                </Text>
+              </View>
+            }
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -249,13 +343,29 @@ const styles = StyleSheet.create({
     paddingTop: Theme.spacing.md,
     paddingBottom: Theme.spacing.sm,
     backgroundColor: Theme.colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.colors.border,
+    borderBottomWidth: 2,
+    borderBottomColor: Theme.colors.primary,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  titleAccent: {
+    width: 4,
+    height: 24,
+    backgroundColor: Theme.colors.primary,
+    marginRight: Theme.spacing.sm,
+    borderRadius: 2,
   },
   title: {
     fontSize: Theme.fontSize.xl,
     fontWeight: Theme.fontWeight.bold,
     color: Theme.colors.text.primary,
+  },
+  settingsButton: {
+    padding: Theme.spacing.xs,
+    borderRadius: Theme.borderRadius.sm,
+    backgroundColor: Theme.colors.secondary,
   },
   content: {
     flex: 1,
@@ -329,11 +439,11 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: 'row',
-    gap: Theme.spacing.md,
     width: '100%',
   },
   editButton: {
     flex: 1,
+    marginRight: Theme.spacing.sm,
   },
   logoutButton: {
     flex: 1,
@@ -349,7 +459,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: Theme.spacing.md,
-    gap: Theme.spacing.xs,
     borderBottomWidth: 2,
     borderBottomColor: 'transparent',
   },
@@ -396,7 +505,6 @@ const styles = StyleSheet.create({
   recipeLikes: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
   },
   recipeLikesText: {
     color: Theme.colors.text.white,
@@ -419,5 +527,47 @@ const styles = StyleSheet.create({
     color: Theme.colors.text.light,
     marginTop: Theme.spacing.xs,
     textAlign: 'center',
+  },
+  savedRecipeItem: {
+    flexDirection: 'row',
+    backgroundColor: Theme.colors.background,
+    marginBottom: Theme.spacing.sm,
+    borderRadius: Theme.borderRadius.md,
+    overflow: 'hidden',
+    ...Theme.shadows.sm,
+  },
+  savedRecipeImage: {
+    width: 80,
+    height: 80,
+    backgroundColor: Theme.colors.secondary,
+  },
+  savedRecipeInfo: {
+    flex: 1,
+    padding: Theme.spacing.md,
+    justifyContent: 'space-between',
+  },
+  savedRecipeTitle: {
+    fontSize: Theme.fontSize.md,
+    fontWeight: Theme.fontWeight.semiBold,
+    color: Theme.colors.text.primary,
+    marginBottom: Theme.spacing.xs,
+  },
+  savedRecipeFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  savedRecipeUser: {
+    fontSize: Theme.fontSize.sm,
+    color: Theme.colors.text.secondary,
+  },
+  savedRecipeLikes: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  savedRecipeLikesText: {
+    fontSize: Theme.fontSize.xs,
+    color: Theme.colors.text.secondary,
+    fontWeight: Theme.fontWeight.medium,
   },
 });

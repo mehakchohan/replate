@@ -14,7 +14,6 @@ import { Theme } from '../../src/theme/colors';
 interface LeaderboardUser {
   id: number;
   username: string;
-  followers: number;
   posts: number;
   totalLikes: number;
 }
@@ -23,7 +22,7 @@ export default function LeaderboardScreen() {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [sortBy, setSortBy] = useState<'totalLikes' | 'followers' | 'posts'>('totalLikes');
+  // Always sort by totalLikes since we removed sorting options
 
   const fetchLeaderboard = async () => {
     try {
@@ -33,11 +32,11 @@ export default function LeaderboardScreen() {
     } catch (error) {
       console.log('Using mock data for demo');
       setUsers([
-        { id: 1, username: 'chef_master', followers: 320, posts: 25, totalLikes: 1250 },
-        { id: 2, username: 'foodie123', followers: 150, posts: 12, totalLikes: 890 },
-        { id: 3, username: 'healthyguru', followers: 200, posts: 18, totalLikes: 720 },
-        { id: 4, username: 'bakerqueen', followers: 180, posts: 15, totalLikes: 650 },
-        { id: 5, username: 'spicychef', followers: 95, posts: 8, totalLikes: 420 },
+        { id: 1, username: 'chef_master', posts: 25, totalLikes: 1250 },
+        { id: 2, username: 'foodie123', posts: 12, totalLikes: 890 },
+        { id: 3, username: 'healthyguru', posts: 18, totalLikes: 720 },
+        { id: 4, username: 'bakerqueen', posts: 15, totalLikes: 650 },
+        { id: 5, username: 'spicychef', posts: 8, totalLikes: 420 },
       ]);
     } finally {
       setLoading(false);
@@ -54,7 +53,7 @@ export default function LeaderboardScreen() {
     fetchLeaderboard();
   };
 
-  const sortedUsers = [...users].sort((a, b) => b[sortBy] - a[sortBy]);
+  const sortedUsers = [...users].sort((a, b) => b.totalLikes - a.totalLikes);
 
   const getRankIcon = (index: number) => {
     switch (index) {
@@ -73,15 +72,6 @@ export default function LeaderboardScreen() {
     }
   };
 
-  const getSortButtonStyle = (currentSort: string) => [
-    styles.sortButton,
-    sortBy === currentSort && styles.sortButtonActive,
-  ];
-
-  const getSortTextStyle = (currentSort: string) => [
-    styles.sortText,
-    sortBy === currentSort && styles.sortTextActive,
-  ];
 
   const renderUser = ({ item, index }: { item: LeaderboardUser; index: number }) => (
     <TouchableOpacity style={styles.userItem}>
@@ -99,21 +89,15 @@ export default function LeaderboardScreen() {
         <Text style={styles.username}>{item.username}</Text>
         <View style={styles.userStats}>
           <Text style={styles.statText}>{item.posts} posts</Text>
-          <Text style={styles.statDivider}>•</Text>
-          <Text style={styles.statText}>{item.followers} followers</Text>
         </View>
       </View>
 
       <View style={styles.userScore}>
         <Text style={styles.scoreNumber}>
-          {sortBy === 'totalLikes' && item.totalLikes}
-          {sortBy === 'followers' && item.followers}
-          {sortBy === 'posts' && item.posts}
+          {item.totalLikes}
         </Text>
         <Text style={styles.scoreLabel}>
-          {sortBy === 'totalLikes' && 'likes'}
-          {sortBy === 'followers' && 'followers'}
-          {sortBy === 'posts' && 'posts'}
+          likes
         </Text>
       </View>
     </TouchableOpacity>
@@ -122,35 +106,15 @@ export default function LeaderboardScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Leaderboard</Text>
-        <Ionicons name="trophy-outline" size={24} color={Theme.colors.primary} />
+        <View style={styles.titleContainer}>
+          <View style={styles.titleAccent} />
+          <Text style={styles.title}>Leaderboard</Text>
+        </View>
+        <View style={styles.trophyContainer}>
+          <Ionicons name="trophy-outline" size={24} color={Theme.colors.primary} />
+        </View>
       </View>
 
-      <View style={styles.sortContainer}>
-        <TouchableOpacity
-          style={getSortButtonStyle('totalLikes')}
-          onPress={() => setSortBy('totalLikes')}
-        >
-          <Ionicons name="heart" size={16} color={sortBy === 'totalLikes' ? Theme.colors.text.white : Theme.colors.text.secondary} />
-          <Text style={getSortTextStyle('totalLikes')}>Likes</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={getSortButtonStyle('followers')}
-          onPress={() => setSortBy('followers')}
-        >
-          <Ionicons name="people" size={16} color={sortBy === 'followers' ? Theme.colors.text.white : Theme.colors.text.secondary} />
-          <Text style={getSortTextStyle('followers')}>Followers</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={getSortButtonStyle('posts')}
-          onPress={() => setSortBy('posts')}
-        >
-          <Ionicons name="restaurant" size={16} color={sortBy === 'posts' ? Theme.colors.text.white : Theme.colors.text.secondary} />
-          <Text style={getSortTextStyle('posts')}>Posts</Text>
-        </TouchableOpacity>
-      </View>
 
       <FlatList
         data={sortedUsers}
@@ -190,20 +154,35 @@ const styles = StyleSheet.create({
     paddingTop: Theme.spacing.md,
     paddingBottom: Theme.spacing.sm,
     backgroundColor: Theme.colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: Theme.colors.border,
+    borderBottomWidth: 2,
+    borderBottomColor: Theme.colors.primary,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  titleAccent: {
+    width: 4,
+    height: 24,
+    backgroundColor: Theme.colors.primary,
+    marginRight: Theme.spacing.sm,
+    borderRadius: 2,
   },
   title: {
     fontSize: Theme.fontSize.xl,
     fontWeight: Theme.fontWeight.bold,
     color: Theme.colors.text.primary,
   },
+  trophyContainer: {
+    padding: Theme.spacing.xs,
+    borderRadius: Theme.borderRadius.sm,
+    backgroundColor: Theme.colors.secondary,
+  },
   sortContainer: {
     flexDirection: 'row',
     paddingHorizontal: Theme.spacing.lg,
     paddingVertical: Theme.spacing.md,
     backgroundColor: Theme.colors.background,
-    gap: Theme.spacing.sm,
   },
   sortButton: {
     flex: 1,
@@ -214,7 +193,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Theme.spacing.md,
     borderRadius: Theme.borderRadius.md,
     backgroundColor: Theme.colors.secondary,
-    gap: Theme.spacing.xs,
+    marginHorizontal: Theme.spacing.xs,
   },
   sortButtonActive: {
     backgroundColor: Theme.colors.primary,

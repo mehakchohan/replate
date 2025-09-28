@@ -19,8 +19,13 @@ import { Input } from '../../src/components/Input';
 export default function PostScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [caption, setCaption] = useState('');
+  const [fullRecipe, setFullRecipe] = useState('');
   const [image, setImage] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const availableTags = ['italian', 'coffee', 'quick', 'healthy', 'dessert', 'spicy', 'vegetarian', 'comfort', 'breakfast', 'dinner', 'lunch', 'snack'];
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -73,6 +78,14 @@ export default function PostScreen() {
     );
   };
 
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev =>
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
   const handlePost = async () => {
     if (!title || !description) {
       Alert.alert('Error', 'Please fill in title and description');
@@ -90,7 +103,10 @@ export default function PostScreen() {
         body: JSON.stringify({
           title,
           description,
+          caption,
+          fullRecipe,
           image: image || 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300',
+          tags: selectedTags,
           userId: 1, // Mock user ID
         }),
       });
@@ -102,7 +118,10 @@ export default function PostScreen() {
           { text: 'OK', onPress: () => {
             setTitle('');
             setDescription('');
+            setCaption('');
+            setFullRecipe('');
             setImage(null);
+            setSelectedTags([]);
           }}
         ]);
       } else {
@@ -113,7 +132,10 @@ export default function PostScreen() {
         { text: 'OK', onPress: () => {
           setTitle('');
           setDescription('');
+          setCaption('');
+          setFullRecipe('');
           setImage(null);
+          setSelectedTags([]);
         }}
       ]);
     } finally {
@@ -168,6 +190,55 @@ export default function PostScreen() {
                 numberOfLines={6}
                 textAlignVertical="top"
               />
+            </View>
+          </View>
+
+          <Input
+            label="Caption (Optional)"
+            placeholder="Add a fun caption for your post..."
+            value={caption}
+            onChangeText={setCaption}
+          />
+
+          <View style={styles.textAreaContainer}>
+            <Text style={styles.label}>Full Recipe (Optional)</Text>
+            <View style={styles.textAreaWrapper}>
+              <TextInput
+                style={styles.textArea}
+                placeholder="Enter the complete recipe with step-by-step instructions..."
+                placeholderTextColor={Theme.colors.text.light}
+                value={fullRecipe}
+                onChangeText={setFullRecipe}
+                multiline
+                numberOfLines={8}
+                textAlignVertical="top"
+              />
+            </View>
+          </View>
+
+          <View style={styles.tagsSection}>
+            <Text style={styles.label}>Tags</Text>
+            <Text style={styles.tagSubtext}>Select tags to help others discover your recipe</Text>
+            <View style={styles.tagsContainer}>
+              {availableTags.map((tag) => (
+                <TouchableOpacity
+                  key={tag}
+                  style={[
+                    styles.tagButton,
+                    selectedTags.includes(tag) && styles.selectedTagButton,
+                  ]}
+                  onPress={() => toggleTag(tag)}
+                >
+                  <Text
+                    style={[
+                      styles.tagButtonText,
+                      selectedTags.includes(tag) && styles.selectedTagButtonText,
+                    ]}
+                  >
+                    #{tag}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
 
@@ -292,6 +363,39 @@ const styles = StyleSheet.create({
     color: Theme.colors.text.secondary,
     marginBottom: Theme.spacing.xs,
     lineHeight: 18,
+  },
+  tagsSection: {
+    marginBottom: Theme.spacing.lg,
+  },
+  tagSubtext: {
+    fontSize: Theme.fontSize.xs,
+    color: Theme.colors.text.secondary,
+    marginBottom: Theme.spacing.sm,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Theme.spacing.xs,
+  },
+  tagButton: {
+    paddingHorizontal: Theme.spacing.md,
+    paddingVertical: Theme.spacing.xs,
+    borderRadius: Theme.borderRadius.lg,
+    backgroundColor: Theme.colors.secondary,
+    borderWidth: 1,
+    borderColor: Theme.colors.border,
+  },
+  selectedTagButton: {
+    backgroundColor: Theme.colors.primary,
+    borderColor: Theme.colors.primary,
+  },
+  tagButtonText: {
+    fontSize: Theme.fontSize.sm,
+    fontWeight: Theme.fontWeight.medium,
+    color: Theme.colors.text.secondary,
+  },
+  selectedTagButtonText: {
+    color: Theme.colors.text.white,
   },
   footer: {
     padding: Theme.spacing.lg,

@@ -3,26 +3,26 @@ export const Colors = {
   primaryLight: '#a52a2a', // Light maroon
   primaryDark: '#4d0000',  // Dark maroon
 
-  secondary: '#f5f5f5',    // Light gray
-  secondaryDark: '#e8e8e8', // Slightly darker gray
+  secondary: '#f8f4f4',    // Light maroon tinted gray
+  secondaryDark: '#e8d8d8', // Slightly darker maroon tinted gray
 
   background: '#ffffff',    // White
-  surface: '#fafafa',      // Off-white
+  surface: '#fdfcfc',      // Off-white with subtle maroon tint
 
   text: {
-    primary: '#212121',    // Dark gray
-    secondary: '#757575',  // Medium gray
-    light: '#bdbdbd',     // Light gray
+    primary: '#2a1111',    // Dark maroon tinted text
+    secondary: '#754545',  // Maroon tinted medium gray
+    light: '#bd9999',     // Maroon tinted light gray
     white: '#ffffff',     // White
   },
 
-  accent: '#ff6b6b',       // Coral red for highlights
+  accent: '#d45087',       // Maroon-pink for highlights
   success: '#4caf50',      // Green
   warning: '#ff9800',      // Orange
-  error: '#f44336',        // Red
+  error: '#c44569',        // Maroon-red
 
-  border: '#e0e0e0',       // Light border
-  shadow: '#00000020',     // Semi-transparent black
+  border: '#e0d0d0',       // Light maroon tinted border
+  shadow: '#80000020',     // Semi-transparent maroon
 };
 
 export const Theme = {
